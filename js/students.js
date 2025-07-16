@@ -1,3 +1,45 @@
+const students = require('../students.json');
+const path = require('path');
+const fs = require('fs');
+let variables = {};
+
+function generateClassInfo(students) {
+  for (const [className, studentData] of Object.entries(students)) {
+    const studentNames = Object.values(studentData).slice(1); 
+    const numberOfStudents = studentNames.length; 
+
+    let classCount = numberOfStudents;  
+    let teacherName = studentData.Teacher; 
+
+    variables[className] = {
+      classCount,
+      teacherName
+    };
+
+    const classLevel = className.split('-')[0]; 
+    const classLetter = className.split('-')[1]; 
+    const filePath = `../class/${classLevel}/${classLevel}${classLetter}.html`;
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${className} - Talabalar Ro'yxati</title>
+  <link href="../../css/main.css" rel="stylesheet">
+  <link href="../../css/dark.css" rel="stylesheet">
+</head>
+<body>
+  <h1 class="Title">${className} - Talabalar Ro'yxati</h1>
+  <h2 class="students">O'qituvchi: ${studentData.Teacher}</h2>
+  <ul>
+    ${studentNames.map(name => `<li>${name}</li>`).join('')}
+  </ul>
+  <p cass="count">Talabalar soni: ${classCount}</p>
+</body>
+</html>
+
 <!DOCTYPE html>
 <html lang="en">
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
@@ -12,7 +54,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com/">
 	<link rel="shortcut icon" href="img/icons/icon-48x48.png" />
 
-	<title>Static || Kikmyonazarov's</title>
+	<title>Static ${className} || Kikmyonazarov's</title>
 
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&amp;display=swap" rel="stylesheet">
 
@@ -57,7 +99,7 @@
 					</li>
 					<li class="sidebar-item active">
 						<a data-bs-target="#dashboards" data-bs-toggle="collapse" class="sidebar-link">
-							<i class="align-middle" data-feather="sliders"></i> <span class="align-middle">Sniflar</span>
+							<i class="align-middle" data-feather="sliders"></i> <span class="align-middle">${className} sinif  rouhati</span>
 						</a>
 						<ul id="dashboards" class="sidebar-dropdown list-unstyled collapse show" data-bs-parent="#sidebar">
 							<li class="sidebar-item active"><a class='sidebar-link' href='index.html'>Umumiy</a></li>
@@ -289,7 +331,7 @@
 											<div class="card-body">
 												<div class="row">
 													<div class="col mt-0">
-														<h5 class="card-title">Jami Oquvchilar</h5>
+														<h5 class="card-title">Jami ${className} Snifi Oquvchilari</h5>
 													</div>
 
 													<div class="col-auto">
@@ -298,10 +340,10 @@
 														</div>
 													</div>
 												</div>
-												<h1 class="mt-1 mb-3" id="jamioquvchilar">2.382</h1>
+												<h1 class="mt-1 mb-3" id="jamioquvchilar">Bugun jami oquvchilar soni: ${classCount}</h1>
 												<div class="mb-0">
-													<span class="badge badge-primary-light">+3.65%</span>
-													<span class="text-muted">Since last year</span>
+													<span class="badge badge-primary-light" id="jami${classname}foiz>+3.54%</span>
+													<span class="text-muted">Since last day</span>
 												</div>
 											</div>
 										</div>
@@ -318,7 +360,7 @@
 														</div>
 													</div>
 												</div>
-												<h1 class="mt-1 mb-3">14</h1>
+												<h1 class="mt-1 mb-3">kelmagan Oquvchiar soni: ${classCount}</h1>
 												<div class="mb-0">
 													<span class="badge badge-success-light">5.25%</span>
 													<span class="text-muted">Since last year</span>
@@ -706,4 +748,16 @@
 	</script>
 
 </body>
-</html>
+</html>`;
+
+    const dirPath = path.dirname(filePath);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    fs.writeFileSync(filePath, htmlContent, 'utf8');
+    console.log(`${filePath} yaratildi!`);
+  }
+}
+
+generateClassInfo(students);
